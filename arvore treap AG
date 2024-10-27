@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Estrutura do nó da Treap
+typedef struct TreapNode {
+    int key, priority;
+    struct TreapNode *left, *right;
+} TreapNode;
+
+// Função para criar um novo nó na Treap
+TreapNode* newNode(int key) {
+    TreapNode* temp = (TreapNode*)malloc(sizeof(TreapNode));
+    temp->key = key;
+    temp->priority = rand() % 100;  // Prioridade aleatória
+    temp->left = temp->right = NULL;
+    return temp;
+}
+
+// Rotação à direita
+TreapNode* rightRotate(TreapNode* y) {
+    TreapNode* x = y->left;
+    y->left = x->right;
+    x->right = y;
+    return x;
+}
+
+// Rotação à esquerda
+TreapNode* leftRotate(TreapNode* x) {
+    TreapNode* y = x->right;
+    x->right = y->left;
+    y->left = x;
+    return y;
+}
+
+// Função para inserir uma nova chave na Treap
+TreapNode* insert(TreapNode* root, int key) {
+    if (!root)
+        return newNode(key);
+
+    if (key < root->key) {
+        root->left = insert(root->left, key);
+        if (root->left->priority > root->priority)
+            root = rightRotate(root);
+    }
+    else {
+        root->right = insert(root->right, key);
+        if (root->right->priority > root->priority)
+            root = leftRotate(root);
+    }
+    return root;
+}
+
+// Função para exibir a Treap em ordem
+void inorder(TreapNode* root) {
+    if (root) {
+        inorder(root->left);
+        printf("Key: %d | Priority: %d\n", root->key, root->priority);
+        inorder(root->right);
+    }
+}
+
+// Função principal
+int main() {
+    srand(time(NULL));
+    TreapNode* root = NULL;
+    int keys[] = {20, 15, 10, 5, 30, 25, 35};
+
+    for (int i = 0; i < sizeof(keys)/sizeof(keys[0]); i++)
+        root = insert(root, keys[i]);
+
+    printf("Inorder traversal of Treap:\n");
+    inorder(root);
+
+    return 0;
+}
